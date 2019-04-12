@@ -61,7 +61,7 @@ int ntp_validate_packet(const struct ip *ip_hdr, uint32_t len, uint32_t *src_ip,
 		struct udphdr *udp =
 		    (struct udphdr *)((char *)ip_hdr + ip_hdr->ip_hl * 4);
 		uint16_t sport = ntohs(udp->uh_sport);
-		if (sport != zconf.target_port) {
+		if (sport != zconf.target_ports[0]) {
 			return 0;
 		}
 	}
@@ -198,7 +198,7 @@ int ntp_init_perthread(void *buf, macaddr_t *src, macaddr_t *gw,
 	ntp_header->LI_VN_MODE = 227;
 	len = sizeof(struct udphdr) + sizeof(struct ntphdr);
 
-	make_udp_header(udp_header, zconf.target_port, len);
+	make_udp_header(udp_header, zconf.target_ports[0], len);
 
 	char *payload = (char *)(&ntp_header[1]);
 

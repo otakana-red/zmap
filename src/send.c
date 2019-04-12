@@ -237,7 +237,7 @@ int send_run(sock_t st, shard_t *s)
 	void *probe_data;
 	if (zconf.probe_module->thread_initialize) {
 		zconf.probe_module->thread_initialize(
-		    buf, zconf.hw_mac, zconf.gw_mac, zconf.target_port,
+		    buf, zconf.hw_mac, zconf.gw_mac, zconf.target_ports,
 		    &probe_data);
 	}
 	pthread_mutex_unlock(&send_mutex);

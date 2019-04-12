@@ -716,7 +716,7 @@ int dns_init_perthread(void *buf, macaddr_t *src, macaddr_t *gw,
 
 	struct udphdr *udp_header = (struct udphdr *)(&ip_header[1]);
 	len = sizeof(struct udphdr) + dns_packet_lens[0];
-	make_udp_header(udp_header, zconf.target_port, len);
+	make_udp_header(udp_header, zconf.target_ports[0], len);
 
 	char *payload = (char *)(&udp_header[1]);
 	module_dns.packet_length = sizeof(struct ether_header) +
@@ -768,6 +768,7 @@ int dns_make_packet(void *buf, size_t *buf_len,
 	udp_header->uh_sport =
 	    htons(get_src_port(num_ports, probe_num, validation));
 
+	udp_header->uh_dport =get_state_port(probe_num);
 	dns_header *dns_header_p = (dns_header *)&udp_header[1];
 
 	dns_header_p->id = validation[2] & 0xFFFF;
@@ -836,7 +837,7 @@ int dns_validate_packet(const struct ip *ip_hdr, uint32_t len, uint32_t *src_ip,
 		return 0;
 	}
 	// Verify our source port.
-	if (sport != zconf.target_port) {
+	if (sport != zconf.target_ports[0]) {
 		return 0;
 	}
 	// Verify our packet length.

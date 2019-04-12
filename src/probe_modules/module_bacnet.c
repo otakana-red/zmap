@@ -50,7 +50,7 @@ int bacnet_init_perthread(void *buf, macaddr_t *src, macaddr_t *gw,
 	make_ip_header(ip_header, IPPROTO_UDP, htons(ip_len));
 
 	uint16_t udp_len = sizeof(struct udphdr) + 0x11;
-	make_udp_header(udp_header, zconf.target_port, udp_len);
+	make_udp_header(udp_header, zconf.target_ports[0], udp_len);
 
 	bnp->vlc.type = ZMAP_BACNET_TYPE_IP;
 	bnp->vlc.function = ZMAP_BACNET_FUNCTION_UNICAST_NPDU;
@@ -88,7 +88,7 @@ int bacnet_make_packet(void *buf, UNUSED size_t *buf_len,
 
 	udp_header->uh_sport =
 	    htons(get_src_port(num_ports, probe_num, validation));
-
+	udp_header->uh_dport =get_state_port(probe_num);
 	bnp->apdu.invoke_id = get_invoke_id(validation);
 
 	ip_header->ip_sum = zmap_ip_checksum((unsigned short *)ip_header);
@@ -108,7 +108,7 @@ int bacnet_validate_packet(const struct ip *ip_hdr, uint32_t len,
 		struct udphdr *udp =
 		    (struct udphdr *)((char *)ip_hdr + ip_hdr->ip_hl * 4);
 		uint16_t sport = ntohs(udp->uh_sport);
-		if (sport != zconf.target_port) {
+		if (sport != zconf.target_ports[0]) {
 			return 0;
 		}
 		if (udp->uh_ulen < sizeof(struct udphdr)) {

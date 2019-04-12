@@ -697,8 +697,22 @@ int main(int argc, char *argv[])
 			    "zmap",
 			    "target port (-p) is required for this type of probe");
 		}
-		enforce_range("target-port", args.target_port_arg, 0, 0xFFFF);
-		zconf.target_port = args.target_port_arg;
+		{
+			int target_ports_len=0;
+			char** target_ports=NULL;
+			split_string(args.target_port_arg,
+					 &(target_ports_len),
+					 &(target_ports));
+			zconf.target_ports=xcalloc(target_ports_len+1, sizeof(uint16_t*));
+			for (int t=0;t<target_ports_len;t++){
+				uint16_t target_port=atoi(target_ports[t]);
+				enforce_range("target-port", target_port, 0, 0xFFFF);
+				zconf.target_ports[t]=htons(target_port);
+				fprintf(stderr,"added port %d\n",target_port);
+			}
+			zconf.packet_streams*=target_ports_len;
+			zconf.packet_streams_divisor=target_ports_len;
+		}
 	}
 	if (args.source_ip_given) {
 		parse_source_ip_addresses(args.source_ip_arg);

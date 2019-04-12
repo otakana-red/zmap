@@ -60,6 +60,7 @@ static int synscan_make_packet(void *buf, UNUSED size_t *buf_len,
 
 	tcp_header->th_sport =
 	    htons(get_src_port(num_ports, probe_num, validation));
+	tcp_header->th_dport =get_state_port(probe_num);
 	tcp_header->th_seq = tcp_seq;
 	tcp_header->th_sum = 0;
 	tcp_header->th_sum =
@@ -103,7 +104,7 @@ static int synscan_validate_packet(const struct ip *ip_hdr, uint32_t len,
 	uint16_t sport = tcp->th_sport;
 	uint16_t dport = tcp->th_dport;
 	// validate source port
-	if (ntohs(sport) != zconf.target_port) {
+	if (ntohs(sport) != zconf.target_ports[0]) {
 		return 0;
 	}
 	// validate destination port

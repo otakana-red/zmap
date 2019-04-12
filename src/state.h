@@ -26,6 +26,7 @@
 #define MAX_PACKET_SIZE 4096
 #define MAC_ADDR_LEN_BYTES 6
 
+extern macaddr_t bcast_mac[MAC_ADDR_LEN_BYTES];
 struct probe_module;
 struct output_module;
 
@@ -41,7 +42,7 @@ struct fieldset_conf {
 // global configuration
 struct state_conf {
 	int log_level;
-	port_h_t target_port;
+	port_h_t* target_ports;
 	port_h_t source_port_first;
 	port_h_t source_port_last;
 	// maximum number of packets that the scanner will send before
@@ -78,6 +79,7 @@ struct state_conf {
 	uint16_t shard_num;
 	uint16_t total_shards;
 	int packet_streams;
+	int packet_streams_divisor;
 	struct probe_module *probe_module;
 	char *output_module_name;
 	struct output_module *output_module;
@@ -137,7 +139,7 @@ struct state_conf {
 #endif
 };
 extern struct state_conf zconf;
-
+uint16_t get_state_port(int iIndex);
 // global sender stats
 struct state_send {
 	double start;

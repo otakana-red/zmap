@@ -8,7 +8,7 @@
 
 #include "state.h"
 #include "../lib/logger.h"
-
+extern macaddr_t bcast_mac[MAC_ADDR_LEN_BYTES]={0xff,0xff,0xff,0xff,0xff,0xff};
 // global configuration and defaults
 struct state_conf zconf = {.log_level = LOG_INFO,
 			   .source_port_first = 32768, // (these are the default
@@ -19,7 +19,7 @@ struct state_conf zconf = {.log_level = LOG_INFO,
 			   .whitelist_filename = NULL,
 			   .list_of_ips_filename = NULL,
 			   .list_of_ips_count = 0,
-			   .target_port = 0,
+			   .target_ports = NULL,
 			   .max_targets = 0xFFFFFFFF,
 			   .max_runtime = 0,
 			   .max_results = 0,
@@ -29,6 +29,7 @@ struct state_conf zconf = {.log_level = LOG_INFO,
 			   .cooldown_secs = 0,
 			   .senders = 1,
 			   .packet_streams = 1,
+			   .packet_streams_divisor = 1,
 			   .seed_provided = 0,
 			   .seed = 0,
 			   .output_module = NULL,
@@ -98,3 +99,7 @@ struct state_recv zrecv = {
     .pcap_drop = 0,
     .pcap_ifdrop = 0,
 };
+
+uint16_t get_state_port(int iIndex){
+	return zconf.target_ports[iIndex%zconf.packet_streams_divisor];
+}

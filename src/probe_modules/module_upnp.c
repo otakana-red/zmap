@@ -77,7 +77,7 @@ int upnp_validate_packet(const struct ip *ip_hdr, uint32_t len,
 		struct udphdr *udp =
 		    (struct udphdr *)((char *)ip_hdr + ip_hdr->ip_hl * 4);
 		uint16_t sport = ntohs(udp->uh_sport);
-		if (sport != zconf.target_port) {
+		if (sport != zconf.target_ports[0]) {
 			return 0;
 		}
 		size_t expected_length =

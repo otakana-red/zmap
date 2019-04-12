@@ -266,7 +266,7 @@ int udp_init_perthread(void *buf, macaddr_t *src, macaddr_t *gw,
 
 	struct udphdr *udp_header = (struct udphdr *)(&ip_header[1]);
 	len = sizeof(struct udphdr) + udp_send_msg_len;
-	make_udp_header(udp_header, zconf.target_port, len);
+	make_udp_header(udp_header, zconf.target_ports[0], len);
 
 	char *payload = (char *)(&udp_header[1]);
 
@@ -295,7 +295,7 @@ int udp_make_packet(void *buf, UNUSED size_t *buf_len,
 	ip_header->ip_ttl = ttl;
 	udp_header->uh_sport =
 	    htons(get_src_port(num_ports, probe_num, validation));
-
+	udp_header->uh_dport=get_state_port(probe_num);
 	if (udp_send_substitutions) {
 		char *payload = (char *)&udp_header[1];
 		int payload_len = 0;
@@ -494,7 +494,7 @@ int udp_do_validate_packet(const struct ip *ip_hdr, uint32_t len,
 		// responding on a different port
 		uint16_t dport = ntohs(udp->uh_dport);
 		uint16_t sport = ntohs(udp->uh_sport);
-		if (dport != zconf.target_port) {
+		if (dport != zconf.target_ports[0]) {
 			return PACKET_INVALID;
 		}
 		if (!check_dst_port(sport, num_ports, validation)) {
